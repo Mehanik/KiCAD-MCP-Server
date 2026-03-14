@@ -92,6 +92,8 @@ export const toolCategories: ToolCategory[] = [
       "rotate_schematic_component",
       "annotate_schematic",
       "add_wire",
+      "add_schematic_wire",
+      "add_schematic_junction",
       "delete_schematic_wire",
       "add_schematic_connection",
       "add_schematic_net_label",
