@@ -24,19 +24,18 @@ _pcbnew.GetBuildVersion.return_value = "9.0.0-stub"
 sys.modules["pcbnew"] = _pcbnew
 
 # ---------------------------------------------------------------------------
-# skip stub — used by PinLocator / _handle_add_schematic_wire at runtime.
+# Stub: skip  (kicad-skip — use real module if available, stub otherwise)
 # ---------------------------------------------------------------------------
-_skip = types.ModuleType("skip")
+try:
+    import skip as _skip_test  # noqa: F401 — try importing real skip
+except ImportError:
+    skip_mod = types.ModuleType("skip")
 
+    class _FakeSchematic:
+        """Minimal stand-in for skip.Schematic used in PinLocator cache."""
+        def __init__(self, path: str):
+            self.path = path
+            self.symbol = []
 
-class _FakeSchematic:
-    def __init__(self, path):
-        self._path = path
-
-    @property
-    def symbol(self):
-        return []
-
-
-_skip.Schematic = _FakeSchematic
-sys.modules["skip"] = _skip
+    skip_mod.Schematic = _FakeSchematic  # type: ignore[attr-defined]
+    sys.modules["skip"] = skip_mod
