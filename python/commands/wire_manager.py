@@ -351,6 +351,7 @@ class WireManager:
             sch_data = sexpdata.loads(sch_content)
 
             # Split any wire that passes through the junction as a midpoint
+            # (mirrors KiCAD's AddJunction / BreakSegments behaviour)
             splits = WireManager._break_wires_at_point(sch_data, position)
             if splits:
                 logger.info(f"Broke {splits} wire(s) at junction position {position}")
