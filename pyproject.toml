@@ -1,0 +1,26 @@
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+strict = false
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint.messages_control]
+disable = [
+  "C0111",  # missing-docstring
+  "R0903",  # too-few-public-methods
+  "W0212",  # protected-access
+]
+
+[tool.bandit]
+targets = ["python"]
+skips = ["B101"]  # assert-used (common in tests)
