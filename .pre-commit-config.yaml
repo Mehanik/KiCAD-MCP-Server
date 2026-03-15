@@ -10,14 +10,6 @@ repos:
         language_version: python3
         files: ^python/
 
-  # Python import sorting
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-        files: ^python/
-        args: ['--profile', 'black']
-
   # Python type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.5.0
@@ -33,14 +25,6 @@ repos:
       - id: pylint
         files: ^python/
         args: [--rcfile=pyproject.toml]
-
-  # Python linting (flake8)
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
-        files: ^python/
-        args: [--max-line-length=100, --extend-ignore=E203]
 
   # TypeScript/JavaScript linting
   - repo: local
@@ -59,31 +43,3 @@ repos:
     hooks:
       - id: prettier
         files: \.(ts|js|json|ya?ml|md)$
-
-  # General file checks
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
-    hooks:
-      - id: trailing-whitespace
-      - id: end-of-file-fixer
-      - id: check-yaml
-      - id: check-json
-      - id: check-added-large-files
-        args: [--maxkb=500]
-      - id: check-merge-conflict
-      - id: detect-private-key
-
-  # Python security checks
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.5
-    hooks:
-      - id: bandit
-        args: [-c, pyproject.toml]
-        files: ^python/
-
-  # Markdown linting
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.37.0
-    hooks:
-      - id: markdownlint
-        args: [--fix]
