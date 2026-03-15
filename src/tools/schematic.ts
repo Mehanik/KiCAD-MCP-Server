@@ -1129,29 +1129,6 @@ Note: operates on .kicad_sch files only. To modify a PCB footprint use edit_comp
     },
   );
 
-  // Find unconnected pins
-  server.tool(
-    "find_unconnected_pins",
-    "List all component pins in the schematic that have no wire, label, or power symbol touching them. Useful for checking connectivity before running ERC.",
-    {
-      schematicPath: z.string().describe("Path to the .kicad_sch schematic file"),
-    },
-    async (args: { schematicPath: string }) => {
-      const result = await callKicadScript("find_unconnected_pins", args);
-      if (result.success) {
-        const pins: any[] = result.unconnectedPins || [];
-        const lines = [`Found ${pins.length} unconnected pin(s):`];
-        pins.slice(0, 50).forEach((p: any) => {
-          lines.push(`  ${p.reference} pin ${p.pinNumber} (${p.pinName}) @ (${p.position.x}, ${p.position.y})`);
-        });
-        if (pins.length > 50) lines.push(`  ... and ${pins.length - 50} more`);
-        return { content: [{ type: "text", text: lines.join("\n") }] };
-      }
-      return {
-        content: [{ type: "text", text: `Failed: ${result.message || "Unknown error"}` }],
-      };
-    },
-  );
 
   // Find overlapping elements
   server.tool(
@@ -1159,7 +1136,7 @@ Note: operates on .kicad_sch files only. To modify a PCB footprint use edit_comp
     "Detect spatially overlapping symbols, wires, and labels in the schematic. Finds duplicate power symbols at the same position, collinear overlapping wires, and labels stacked on top of each other.",
     {
       schematicPath: z.string().describe("Path to the .kicad_sch schematic file"),
-      tolerance: z.number().optional().describe("Distance in mm below which elements are considered overlapping (default: 0.5)"),
+      tolerance: z.number().optional().describe("Distance threshold in mm for label proximity and wire collinearity checks. Symbol overlap uses bounding-box intersection. (default: 0.5)"),
     },
     async (args: { schematicPath: string; tolerance?: number }) => {
       const result = await callKicadScript("find_overlapping_elements", args);
@@ -1244,21 +1221,21 @@ Note: operates on .kicad_sch files only. To modify a PCB footprint use edit_comp
     },
   );
 
-  // Check wire collisions
+  // Find wires crossing symbols
   server.tool(
-    "check_wire_collisions",
-    "Detect wires that pass through component bodies without connecting to their pins. These are usually routing mistakes where a wire crosses over a symbol instead of connecting to it.",
+    "find_wires_crossing_symbols",
+    "Find all wires that cross over component symbol bodies. Wires passing over symbols are unacceptable in schematics — they indicate routing mistakes where a wire was drawn across a component instead of around it.",
     {
       schematicPath: z.string().describe("Path to the .kicad_sch schematic file"),
     },
     async (args: { schematicPath: string }) => {
-      const result = await callKicadScript("check_wire_collisions", args);
+      const result = await callKicadScript("find_wires_crossing_symbols", args);
       if (result.success) {
         const collisions: any[] = result.collisions || [];
-        const lines = [`Found ${collisions.length} wire collision(s):`];
+        const lines = [`Found ${collisions.length} wire(s) crossing symbols:`];
         collisions.slice(0, 30).forEach((c: any, i: number) => {
           lines.push(
-            `  ${i + 1}. Wire (${c.wire.start.x},${c.wire.start.y})→(${c.wire.end.x},${c.wire.end.y}) passes through ${c.component.reference} (${c.component.libId})`
+            `  ${i + 1}. Wire (${c.wire.start.x},${c.wire.start.y})→(${c.wire.end.x},${c.wire.end.y}) crosses ${c.component.reference} (${c.component.libId})`
           );
         });
         if (collisions.length > 30) lines.push(`  ... and ${collisions.length - 30} more`);

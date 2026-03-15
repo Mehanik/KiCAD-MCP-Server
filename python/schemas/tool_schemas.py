@@ -1763,21 +1763,6 @@ SCHEMATIC_TOOLS = [
         }
     },
     {
-        "name": "find_unconnected_pins",
-        "title": "Find Unconnected Pins",
-        "description": "Lists all component pins in the schematic that have no wire, label, or power symbol touching them. Useful for checking connectivity before running ERC. Skips power symbols, template symbols, and pins with no_connect flags.",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "schematicPath": {
-                    "type": "string",
-                    "description": "Path to the .kicad_sch schematic file"
-                }
-            },
-            "required": ["schematicPath"]
-        }
-    },
-    {
         "name": "find_overlapping_elements",
         "title": "Find Overlapping Elements",
         "description": "Detects spatially overlapping symbols, wires, and labels in the schematic. Finds: duplicate power symbols at the same position, collinear overlapping wire segments, and labels stacked on top of each other.",
@@ -1790,7 +1775,7 @@ SCHEMATIC_TOOLS = [
                 },
                 "tolerance": {
                     "type": "number",
-                    "description": "Distance in mm below which elements are considered overlapping (default: 0.5)"
+                    "description": "Distance threshold in mm for label proximity and wire collinearity checks. Symbol overlap uses bounding-box intersection. (default: 0.5)"
                 }
             },
             "required": ["schematicPath"]
@@ -1828,9 +1813,9 @@ SCHEMATIC_TOOLS = [
         }
     },
     {
-        "name": "check_wire_collisions",
-        "title": "Check Wire Collisions",
-        "description": "Detects wires that pass through component bodies without connecting to their pins. These are usually routing mistakes where a wire crosses over a symbol instead of connecting to it. Uses pin-based bounding boxes (approximate but effective for 80/20 detection).",
+        "name": "find_wires_crossing_symbols",
+        "title": "Find Wires Crossing Symbols",
+        "description": "Find all wires that cross over component symbol bodies. Wires passing over symbols are unacceptable in schematics — they indicate routing mistakes where a wire was drawn across a component instead of around it.",
         "inputSchema": {
             "type": "object",
             "properties": {
